@@ -25,11 +25,12 @@ fileDest.close()
 
 # Create time axis for 256 samples & clip y values to the nearest power of 2 (for fft efficiency)
 t = np.linspace(0,12.75,num=256)
+tt = np.linspace(0,0.05*len(y),num=len(y))
 yClip = y[0:256]
 
 gTitleXY("Heart Data",'Samples','16-bit Light Intensity')
 plt.yticks()
-plt.plot(t,yClip)
+plt.plot(tt,y)
 
 plt.show()
 
