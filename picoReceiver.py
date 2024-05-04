@@ -6,8 +6,8 @@ BAUDRATE = 115200
 
 def findPicoCOM():
     portList = serial.tools.list_ports.comports()
-    for port in portList:
-        port,_,hwid = port
+    for portData in portList:
+        port,_,hwid = portData
         if PICO_HARDWARE_ID in hwid:
             return port
     return ""
