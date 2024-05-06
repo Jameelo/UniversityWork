@@ -13,7 +13,7 @@ def gTitleXY(Title,labelX,labelY):
 y = []
 
 # Open data file
-fileDest = open("J:\\University\\ACSEY4\\Project Work\\Data\\Serial_Data.txt","r")
+fileDest = open("J:\\University\\ACSEY4\\Project Work\\Data\\Direct_PPG_Data.txt","r")
 
 # Load data into y axis variable
 for line in fileDest:

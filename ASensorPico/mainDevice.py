@@ -1,20 +1,11 @@
 """
 main program for the medical device's pico
 
-take data samples at a rate of 20Hz, far over the bandwidth of the human heartrate.
-Every 1200 entries minute, save that data to an individual file.
-Then every half hour, send 30 files over to the catcher pico to be sent to the "Server".
-
-Collect heart data @20Hz
-Append it to a file
-When the file has 1200 lines, close it and begin a new one
-Repeat until there are 30 files
-Then stop recording & transmit all 30 files to receiver pico.
-After transmission, delete the 30 data files and repeat from start.
+take data samples at a rate of 20Hz, just over twice the bandwidth of the human heartrate.
+Save recorded data to an individual file, one file for each minute recorded.
+Then every half hour, send the 30 files over to the receiver pico to be sent to the storage device.
+After transmission, the text files may be overwritten. The total storage occupied is around 300kb.
 """
-
-# Justify why the actual device is dumb with no signals processing!
-# Mainly as it allows the pi to be replaced with a dedicated PCB at some point. FUTURE WORK
 
 # Import in all necessary micropython modules:
 import machine
@@ -28,21 +19,24 @@ SAMPLE_INTERVAL = 0.05                   # Period between sample collection
 SAMPLE_COUNT_MINUTE = 60/SAMPLE_INTERVAL # Number of samples collected in one minute
 TIMEOUT_MAX_ATTEMPTS = 16                # Maximum number of attempts the program will make
 COLLECTION_PERIOD = 30                   # Number of minutes the devices will collect data over before transmitting
+TRANSMISSION_DELAY = 0.625               # Delay in seconds between sending each file, to give the receiver time to switch files.
 
-BASE_PATH = "data\\minute{}.txt"                # Modular filepath for the data file
-NETWORK_PARAMS = ["PicoHotspot","RP2040_%^@"]   # Network SSID and password for the hotspot.
+# Filesystem and network constants
+BASE_PATH = "data/minute{}.txt"                 # Modular filepath for the data file
+NETWORK_PARAMS = ["PicoHotspot","RP2040_%^@"]   # Network SSID and password for the AP.
 SERVER_IP_PORT = ("192.168.176.80",80)          # IP of server host (receiver), and the open port
 
-# Declare pins
+# Declaration of pins
 HR_PPG = machine.ADC(HR_PIN)
 LED = machine.Pin("LED", machine.Pin.OUT)
 
-# Initialise LED to low
+# Initialise LED to low(off)
 LED.value(0)
 
 
 """
-Function to connect to the mobile hotspot with the parameters defined in NETWORK_PARAMS
+Function to connect to the wireless access point with the parameters defined in NETWORK_PARAMS.
+Attempt to connect up to TIMEOUT_MAX_ATTEMPTS times, before returning 0.
 """
 def establishConnection():
     wlan = network.WLAN(network.STA_IF)
@@ -50,37 +44,68 @@ def establishConnection():
     wlan.connect(NETWORK_PARAMS[0],NETWORK_PARAMS[1])
     attempts = 0
     # Verify created connection
-    while not wlan.isconnected() or attempts < TIMEOUT_MAX_ATTEMPTS:
+    while not wlan.isconnected():
+        if attempts >= TIMEOUT_MAX_ATTEMPTS:
+            return 0
         utime.sleep(1)
         attempts += 1
     return wlan.ifconfig()[0]
 
 """
-Connect to the receiver and send all files over.
-The socket magic happens here too.
-At the end of the function, close all communication.
+This function sends the entire contents of a single file.
+It opens and manages its own socket as not to time out the connection in a long-lasting data transfer.
+    This is a similar reason to why there are 30 text files.
 """
-def transmitFiles():
-    # Create socket and connect to receiver
-    sDevice = socket.socket()    
+def sendSingle(fileID):
+    # Open the socket
+    sDevice = socket.socket()
     sDevice.connect(SERVER_IP_PORT)
-    # Then for each file: for fileID in range(COLLECTION_PERIOD):
-        # Read a line
-        # Send the size of the line in bytes
-        # Then send the data
-        # Repeat 1200 times until EOF
-    # Close the socket & continue collection
-    pass
+    LED.value(1)
 
-# Main code begins below
+    # Begin reading the file
+    filePath = BASE_PATH.format(fileID)
+    curFile = open(filePath,"r")
 
+    # Encode into UTF-8 and send to receiver
+    for line in curFile:
+        package = line.encode()
+        sDevice.send(package)
+        
+    # Send an end of file or end of transmission statement?
+    if fileID < COLLECTION_PERIOD:
+        sDevice.send("NewFi\r\n".encode())
+        utime.sleep(TRANSMISSION_DELAY)
+    else:
+        sDevice.send("EndOT\r\n".encode())
+
+    # Close device and turn LED off
+    sDevice.close()
+    LED.value(0)
+    return
+
+"""
+This function manages the transmission of all files to wirelessly send over to the receiver.
+"""
+def transmitFiles():    
+    for fileID in range(1,COLLECTION_PERIOD+1): # For each file
+        sendSingle(fileID)                      # Transmit file
+    return
+
+
+# Initialise counter variables
 minuteCount = 1
 sampleCount = 0
 
+# Create initial file to write to (data/minute1.txt)
 filePath = BASE_PATH.format(minuteCount)
 heartFile = open(filePath,"wb")
 
+# Connect to the access point
 deviceIP = establishConnection()
+
+# Continue to attempt to connect to the access point until a connection is made.
+while deviceIP == 0:
+    deviceIP = establishConnection()
 
 while True:
     sampleCount += 1
@@ -88,12 +113,13 @@ while True:
     heartFile.write(sPPG.to_bytes(2,'little')) # Store the sampled value into the text file
 
     if sampleCount >= SAMPLE_COUNT_MINUTE:
-        sampleCount = 0
         minuteCount += 1
+        sampleCount = 0
         if minuteCount > COLLECTION_PERIOD:
-            sampleCount = 0
             minuteCount = 1
-            # Send all 30 text files to the receiver pico, then delete them all.        
+            sampleCount = 0
+            # Send all 30 text files to the receiver pico 
+            transmitFiles()
         # close current text file and open a new one with a name +1
         heartFile.close()
         filePath = BASE_PATH.format(minuteCount)

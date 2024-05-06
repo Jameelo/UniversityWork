@@ -31,12 +31,17 @@ import numpy
 
 PICO_HARDWARE_ID = "2E8A:0005"              # Pico hardware ID to allow for dynamic connections
 BAUDRATE = 115200                           # Serial baudrate
-BASE_PATH = "data\\hour{}\\minute{}.txt"    # Dynamic filepath for health data
+BASE_PATH = "data\\halfHour{}\\minute{}.txt"    # Dynamic filepath for health data
+
 
 # def plotResults():
 # def fourierAnalysis():
-# def viewData(): # look at a certain time period of data (choose start time and duration in hours)
+# def calcHRV(): # Get the hourly HRV from 1/bpm
 
+
+"""
+Check to see if a device containing the Raspberry Pi Pico's hardware ID is connected to this device.
+"""
 def findPicoCOM():
     portList = serial.tools.list_ports.comports()
     for portData in portList:
@@ -47,24 +52,27 @@ def findPicoCOM():
 
 picoPort = findPicoCOM()
 
-while not picoPort:    
-    print("Unable to connect to Raspberry Pi Pico. Retrying connection...")
-    picoPort = findPicoCOM() # COM port the pico is located in.
-    time.sleep(3)
+while True:
+    while not picoPort:    
+        print("Unable to connect to Raspberry Pi Pico. Retrying connection...")
+        picoPort = findPicoCOM() # COM port the pico is located in.
+        time.sleep(3)
 
-print("Pico connected")
+    print("Pico connected")
 
-serial_connection = serial.Serial(picoPort,BAUDRATE) # Establish connection with receiver pico
+    serial_connection = serial.Serial(picoPort,BAUDRATE) # Establish connection with receiver pico
 
-# open file to store data in long-term. Aggregate into a CSV, storing hours as columns
-fileDest = open("J:\\University\\ACSEY4\\Project Work\\Data\\Serial_Data.txt","wb")
+    # open file to store data in long-term. Aggregate into a CSV, storing hours as columns
+    # format filepath here
+    fileDest = open("J:\\University\\ACSEY4\\Project Work\\Data\\Serial_Data.txt","wb")
 
-# Now that the receiver pico has been connected, keep reading from it constantly until it gets unplugged
-while findPicoCOM():
-    # Constantly look for an arbitrary "signal transmission" message
-    # When this is found, begin receiving data and writing them to fileDest.
-    # FileDest needs to be
-    print(serial_connection)
-    time.sleep(0.5)
+    # Now that the receiver pico has been connected, keep reading from it constantly until it gets unplugged
+    while findPicoCOM():
+        # Constantly look for an arbitrary "signal transmission" message
+        # When this is found, begin receiving data and writing them to fileDest.
+        # FileDest needs to be
+        print(serial_connection)
+        time.sleep(0.5)
 
-print("Connection lost")
+    print("Connection lost")
+    fileDest.close()
