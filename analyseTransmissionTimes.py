@@ -77,7 +77,10 @@ trial9[2] = [1357, 1324, 1335, 1635, 1227, 1234, 1324, 1225, 1332, 1245, 1213, 1
 trial9[3] = [1253, 1326, 1527, 1542, 1334, 1527, 1241, 1219, 1334, 1235, 1318, 1234, 1239, 1314, 1434, 1241, 1227, 1224, 1328, 1324, 1236, 1233, 1317, 1237, 1234, 1322, 1334, 1227, 1535, 251, 39]
 
 
-def analyseTrial(trialChoice):
+def analyseTrial(trialChoice,index):
+
+    periods = [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1]
+
     trialSingles = np.zeros((4, 30))
     for n,trial in enumerate(trialChoice):
         trialSingles[n] = trial[:30]
@@ -93,35 +96,35 @@ def analyseTrial(trialChoice):
 
     return singleSD,singleMean,wholeSD,wholeMean
 
-T1sSD,T1sM,T1tSD,T1tM = analyseTrial(trial1)
-T2sSD,T2sM,T2tSD,T2tM = analyseTrial(trial2)
-T3sSD,T3sM,T3tSD,T3tM = analyseTrial(trial3)
-T4sSD,T4sM,T4tSD,T4tM = analyseTrial(trial4)
-T5sSD,T5sM,T5tSD,T5tM = analyseTrial(trial5)
-T6sSD,T6sM,T6tSD,T6tM = analyseTrial(trial6)
-T7sSD,T7sM,T7tSD,T7tM = analyseTrial(trial7)
-T8sSD,T8sM,T8tSD,T8tM = analyseTrial(trial8)
-T9sSD,T9sM,T9tSD,T9tM = analyseTrial(trial9)
+T1sSD,T1sM,T1tSD,T1tM = analyseTrial(trial1,1)
+T2sSD,T2sM,T2tSD,T2tM = analyseTrial(trial2,2)
+T3sSD,T3sM,T3tSD,T3tM = analyseTrial(trial3,3)
+T4sSD,T4sM,T4tSD,T4tM = analyseTrial(trial4,4)
+T5sSD,T5sM,T5tSD,T5tM = analyseTrial(trial5,5)
+T6sSD,T6sM,T6tSD,T6tM = analyseTrial(trial6,6)
+T7sSD,T7sM,T7tSD,T7tM = analyseTrial(trial7,7)
+T8sSD,T8sM,T8tSD,T8tM = analyseTrial(trial8,8)
+T9sSD,T9sM,T9tSD,T9tM = analyseTrial(trial9,9)
 
-xAxis = [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]
+xAxis = [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1]
 
 plt.subplot(2, 2, 2)
-yAxis = [T1sSD,T2sSD,T3sSD,T4sSD,T5sSD,T6sSD,T7sSD,T8sSD]
+yAxis = [T1sSD,T2sSD,T3sSD,T4sSD,T5sSD,T6sSD,T7sSD,T8sSD,T9sSD]
 plt.bar(xAxis,yAxis,0.1)
 gTitleXY("Standard deviation of single file transmission time",'Delay period (s)','Transmission time S.D. (ms)') 
 
 plt.subplot(2, 2, 1)
-yAxis = [T1sM,T2sM,T3sM,T4sM,T5sM,T6sM,T7sM,T8sM]
+yAxis = [T1sM,T2sM,T3sM,T4sM,T5sM,T6sM,T7sM,T8sM,T9sM]
 plt.bar(xAxis,yAxis,0.1)
 gTitleXY("Mean time of single file transmission",'Delay period (s)','transmission time (ms)')
 
 plt.subplot(2, 2, 4)
-yAxis = [T1tSD,T2tSD,T3tSD,T4tSD,T5tSD,T6tSD,T7tSD,T8tSD]
+yAxis = [T1tSD,T2tSD,T3tSD,T4tSD,T5tSD,T6tSD,T7tSD,T8tSD,T9tSD]
 plt.bar(xAxis,yAxis,0.1)
 gTitleXY("Standard deviation of entire transmission",'Delay period (s)','Transmission time S.D. (s)')
 
 plt.subplot(2, 2, 3)
-yAxis = [T1tM,T2tM,T3tM,T4tM,T5tM,T6tM,T7tM,T8tM]
+yAxis = [T1tM,T2tM,T3tM,T4tM,T5tM,T6tM,T7tM,T8tM,T9tM]
 plt.bar(xAxis,yAxis,0.1)
 gTitleXY("Mean time of entire transmission",'Delay period (s)','transmission time (s)')
 
