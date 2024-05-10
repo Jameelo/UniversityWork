@@ -43,7 +43,6 @@ def establishConnection():
     # Verify created connection
     while not wlan.isconnected():
         utime.sleep(1)
-    LED.value(1)
     return wlan.ifconfig()[0]
 
 """
