@@ -73,6 +73,7 @@ while True:
         # FileDest needs to be
         print(serial_connection)
         time.sleep(0.5)
+        # dont forget to use ser.readline() to get the right length!!
 
     print("Connection lost")
     fileDest.close()
