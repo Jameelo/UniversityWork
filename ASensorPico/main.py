@@ -42,13 +42,10 @@ def establishConnection():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(NETWORK_PARAMS[0],NETWORK_PARAMS[1])
-    attempts = 0
     # Verify created connection
     while not wlan.isconnected():
-        if attempts >= TIMEOUT_MAX_ATTEMPTS:
-            return 0
         utime.sleep(1)
-        attempts += 1
+    LED.value(1)
     return wlan.ifconfig()[0]
 
 """
@@ -100,12 +97,8 @@ sampleCount = 0
 filePath = BASE_PATH.format(minuteCount)
 heartFile = open(filePath,"wb")
 
-# Connect to the access point
+# Connect to the access point, or continue to attempt to connect to the access point until a connection is made.
 deviceIP = establishConnection()
-
-# Continue to attempt to connect to the access point until a connection is made.
-while deviceIP == 0:
-    deviceIP = establishConnection()
 
 while True:
     sampleCount += 1
