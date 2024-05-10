@@ -17,7 +17,6 @@ import utime
 HR_PIN = 0                               # ADC pin for the PPG sensor
 SAMPLE_INTERVAL = 0.05                   # Period between sample collection
 SAMPLE_COUNT_MINUTE = 60/SAMPLE_INTERVAL # Number of samples collected in one minute
-TIMEOUT_MAX_ATTEMPTS = 16                # Maximum number of attempts the program will make
 COLLECTION_PERIOD = 30                   # Number of minutes the devices will collect data over before transmitting
 TRANSMISSION_DELAY = 0.625               # Delay in seconds between sending each file, to give the receiver time to switch files.
 
@@ -36,7 +35,6 @@ LED.value(0)
 
 """
 Function to connect to the wireless access point with the parameters defined in NETWORK_PARAMS.
-Attempt to connect up to TIMEOUT_MAX_ATTEMPTS times, before returning 0.
 """
 def establishConnection():
     wlan = network.WLAN(network.STA_IF)
