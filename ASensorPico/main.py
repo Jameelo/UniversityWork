@@ -72,7 +72,7 @@ def sendSingle(fileID):
     else:
         sDevice.send("EndOT\r\n".encode())
 
-    # Close device and turn LED off
+    # Close device socket and turn LED off
     sDevice.close()
     LED.value(0)
     return
