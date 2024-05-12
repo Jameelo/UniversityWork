@@ -9,7 +9,7 @@ BASE_PATH = "J:\\University\\ACSEY4\\Project Work\\Data\\HeartData\\halfHour{}\\
 COLLECTION_PERIOD = 30 # Number of minute files generated over the collection period
 FREQUENCY_LOWER_BOUND = 40
 FREQUENCY_UPPER_BOUND = 216
-MOVING_AVERAGE_KERNEL = np.ones(5)/5
+MOVING_AVERAGE_KERNEL = np.ones(5)/5 
 PPG_RESOLUTION_MS = 50 # Resolution of PPG readings in ms
 TIME_ANALYSIS_THRESHOLD = 0.503 # Heartbreat Detection Threshold
 
@@ -44,7 +44,6 @@ def getHeartRateVariability(minuteData):
                 BTimeArray.append(n)
 
     HRVar = np.std(RRintArray)
-    # remove outliers
 
     return int(HRVar)
 
@@ -58,12 +57,18 @@ def fourierTransform(data,t):
         yFTmag.append(np.linalg.norm(val))
     return yFTmag
 
+"""
+Produce a plot with titles.
+"""
 def plotGraph(xAxis,yAxis,xTitle,yTitle,mainTitle):
     plt.title(mainTitle) 
     plt.xlabel(xTitle) 
     plt.ylabel(yTitle)    
     plt.plot(xAxis,yAxis)
 
+"""
+Unpack a PPG minute file into an array and return it.
+"""
 def unpackMinute(minuteID,halfHourID):
     minuteArray = np.zeros(1200)
     filePath = BASE_PATH.format(halfHourID,minuteID)
@@ -77,8 +82,8 @@ Function to write heart rate and heart rate variability data to
 """
 def writeToFile(halfHourID,HRdata,HRVdata):
     filePath = BASE_PATH[:-13] + "\\HeartStats.txt"
-    print(filePath)
     filePath = filePath.format(halfHourID)
+    print("Processed data file can be found at: ",filePath)
     dataFile = open(filePath,"w")
     dataFile.write("Heart Rate, Heart Rate Variability\r\n")
     for index in range(0,COLLECTION_PERIOD-1):
@@ -86,11 +91,10 @@ def writeToFile(halfHourID,HRdata,HRVdata):
         pass
     dataFile.close()
 
+# Initialise arrays to save memory
 halfHourPlotHR = np.zeros(30)
 halfHourPlotHRV = np.zeros(30)
-
 wholeHalfHour = np.zeros(1200*30)
-
 timeArr = np.linspace(0,60,num=1200)
 freqArr = np.fft.fftfreq(timeArr.shape[-1],0.05) # By inserting 0.05 seconds into this function, the frequency buckets will be plotted as Hz.
 
