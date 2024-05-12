@@ -27,11 +27,11 @@ As this stores 1200 lines of 16-bit values, a single file will be (Worst case):
 import serial
 import serial.tools.list_ports
 import time
-import numpy
+import os
 
 PICO_HARDWARE_ID = "2E8A:0005"              # Pico hardware ID to allow for dynamic connections
 BAUDRATE = 115200                           # Serial baudrate
-BASE_PATH = "data\\halfHour{}\\minute{}.txt"    # Dynamic filepath for health data
+BASE_PATH = "J:\\University\\ACSEY4\\Project Work\\Data\\HeartData\\halfHour{}\\minute{}.txt"    # Dynamic filepath for health data
 
 
 # def plotResults():
@@ -52,28 +52,43 @@ def findPicoCOM():
 
 picoPort = findPicoCOM()
 
+halfHourCount = 1
+minutecount = 1
+
 while True:
     while not picoPort:    
         print("Unable to connect to Raspberry Pi Pico. Retrying connection...")
         picoPort = findPicoCOM() # COM port the pico is located in.
-        time.sleep(3)
+        time.sleep(1)
 
     print("Pico connected")
 
+    filePath = BASE_PATH.format(halfHourCount,minutecount)
+    if not os.path.exists(filePath):
+        os.makedirs(filePath[:-14])
+    fileDest = open(filePath,"w")
+
     serial_connection = serial.Serial(picoPort,BAUDRATE) # Establish connection with receiver pico
 
-    # open file to store data in long-term. Aggregate into a CSV, storing hours as columns
-    # format filepath here
-    fileDest = open("J:\\University\\ACSEY4\\Project Work\\Data\\Serial_Data.txt","wb")
-
     # Now that the receiver pico has been connected, keep reading from it constantly until it gets unplugged
-    while findPicoCOM():
-        # Constantly look for an arbitrary "signal transmission" message
-        # When this is found, begin receiving data and writing them to fileDest.
-        # FileDest needs to be
-        print(serial_connection)
-        time.sleep(0.5)
-        # dont forget to use ser.readline() to get the right length!!
-
-    print("Connection lost")
-    fileDest.close()
+    while True:
+        if findPicoCOM():
+            serData = serial_connection.readline()
+        if serData != b'' and serData != b'\r\n':
+            # Then the received data is not empty, and should be written to a file.
+            data = serData.decode()
+            if "NewFi" in data: # If the program is to write to a new file    
+                minutecount += 1
+                filePath = BASE_PATH.format(halfHourCount,minutecount)
+                fileDest = open(filePath,"w")
+            elif "EndOT" in data: 
+                # If the transmission has ended
+                halfHourCount += 1
+                minutecount = 0 
+                fileDest.close()
+                break
+            else:
+                # Otherwise, the recieved data must be numerical.
+                # Must write the value between the last two apostrophes printed.
+                fileDest.write(data)
+    time.sleep(5)

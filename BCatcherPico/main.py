@@ -48,11 +48,11 @@ def sendStorage():
         filePath = BASE_PATH.format(fileID)
         curFile = open(filePath,"r")
         for line in curFile:
-            print(line.encode())
+            print(line)
         if fileID < COLLECTION_PERIOD:
-            print("NewFi\r\n".encode())
+            print("NewFi\r\n")
         else:
-            print("EndOT\r\n".encode())
+            print("EndOT\r\n")
     pass
 
 receiverIP = establishConnection()
