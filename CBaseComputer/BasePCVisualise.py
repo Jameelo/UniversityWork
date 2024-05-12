@@ -72,6 +72,20 @@ def unpackMinute(minuteID,halfHourID):
         minuteArray[index] = float(line)/(2**16)
     return minuteArray
 
+"""
+Function to write heart rate and heart rate variability data to
+"""
+def writeToFile(halfHourID,HRdata,HRVdata):
+    filePath = BASE_PATH[:-13] + "\\HeartStats.txt"
+    print(filePath)
+    filePath = filePath.format(halfHourID)
+    dataFile = open(filePath,"w")
+    dataFile.write("Heart Rate, Heart Rate Variability\r\n")
+    for index in range(0,COLLECTION_PERIOD-1):
+        dataFile.write("{},{}\r\n".format(HRdata[index],HRVdata[index]))
+        pass
+    dataFile.close()
+
 halfHourPlotHR = np.zeros(30)
 halfHourPlotHRV = np.zeros(30)
 
@@ -102,3 +116,5 @@ plt.subplot(2,1,2)
 plotGraph(np.linspace(0,30,num=30),halfHourPlotHRV,"Time (Minutes)","Heart Rate Variability (ms)","Plot of heart rate variability")
 plt.suptitle("Minutely heart rate and heart rate variability over a 30 minute period")
 plt.show()
+
+writeToFile(halfHour,halfHourPlotHR,halfHourPlotHRV)
