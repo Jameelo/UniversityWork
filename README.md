@@ -1,4 +1,4 @@
-﻿# Dissertaion project repository
+﻿# Dissertation project repository
 ### The code here concerns the creation of an e-textiles platform that records and transmits heart data.
 
 There are 3 separate machines used in this dissertation:\
