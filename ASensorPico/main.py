@@ -100,7 +100,7 @@ deviceIP = establishConnection()
 while True:
     sampleCount += 1
     sPPG = HR_PPG.read_u16() # Sampled PPG reading
-    heartFile.write(sPPG.to_bytes(2,'little')) # Store the sampled value into the text file
+    heartFile.write(str(sPPG)+"\r\n") # Store the sampled value into the text file
 
     if sampleCount >= SAMPLE_COUNT_MINUTE:
         minuteCount += 1
