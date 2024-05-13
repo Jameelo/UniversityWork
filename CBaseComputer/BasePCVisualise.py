@@ -39,7 +39,7 @@ def getHeartRateVariability(minuteData):
             # If the value is large enough to count as a heartbeat, and it has been at least .35 seconds
             if minuteData[n-1] < val and minuteData[n+1] < val:
                 # If the point is a local maximum
-                RRinterval = (n-BTimeArray[-1])*20 # This value is the RR interval in units of 1/20th of a second.
+                RRinterval = (n-BTimeArray[-1])*0.05*1000 # This value is the RR interval in units of 0.05 seconds, so multiplying by 0.05 to get time in s, then 1000 to get time in ms.
                 RRintArray.append(RRinterval)
                 BTimeArray.append(n)
 
