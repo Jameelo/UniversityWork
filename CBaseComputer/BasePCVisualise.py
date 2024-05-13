@@ -121,4 +121,8 @@ plotGraph(np.linspace(0,30,num=30),halfHourPlotHRV,"Time (Minutes)","Heart Rate 
 plt.suptitle("Minutely heart rate and heart rate variability over a 30 minute period")
 plt.show()
 
+avgHRV = [(1/(n/60))*1000 for n in halfHourPlotHR]
+
+print(np.std(avgHRV))
+
 writeToFile(halfHour,halfHourPlotHR,halfHourPlotHRV)
