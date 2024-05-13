@@ -35,7 +35,7 @@ def getHeartRateVariability(minuteData):
 
     # Generate values for ALL threshold intervals
     for n,val in enumerate(minuteData):
-        if val > TIME_ANALYSIS_THRESHOLD and n-BTimeArray[-1] > 7:
+        if val > TIME_ANALYSIS_THRESHOLD and n-BTimeArray[-1] >= 7:
             # If the value is large enough to count as a heartbeat, and it has been at least .35 seconds
             if minuteData[n-1] < val and minuteData[n+1] < val:
                 # If the point is a local maximum
